@@ -1,0 +1,61 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# 加载包
+library(tidyverse)
+library(jiebaR)
+library(wordcloud2)
+library(stringr)
+
+# 读入文件
+
+filePath <- 'zyc-0505.txt'
+text <-  read_lines(filePath)
+
+
+# 预处理
+txt <-  text[text!=""]
+txt
+
+# 新建分词器
+z <- worker()
+```
+
+```{r}
+# 新词
+new_user_word(分词器, "朱星杰", "n") 
+```
+
+```{r}
+segWords <- segment(txt,z)
+```
+
+```{r}
+# 停止词
+stopwords <- c("的", "了", "在", "是", "我", "有", "和", "就",  "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这",
+               "评论","转发","点赞","数","点赞数","发布","时间",'--')
+segWords <- filter_segment(segWords,stopwords)
+
+
+
+# 去除数字、英文、空格
+###去除数字和英文
+segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
+
+
+segWords<-str_trim(segWords)#去除空格
+
+# 词频统计
+tableWord <- plyr::count(segWords)
+write.csv(tableWord,'nid.csv')
+
+# 词云
+wordcloud2(tableWord, size = 2, fontFamily = "微软雅黑",  
+
+color = "random-light", backgroundColor = "grey")  
+
+```
+
