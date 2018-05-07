@@ -12,21 +12,47 @@ library(stringr)
 
 # 读入文件
 
-filePath <- 'zyc-0505.txt'
-text <-  read_lines(filePath)
+filePath <- 'weibo/2013783327.txt'
+text <- read_lines(filePath,skip=8)
 
 
 # 预处理
 txt <-  text[text!=""]
-txt
+length(txt)
+
+# 提取微博正文
+seq1 <- seq(1,length(txt),by=3)
+weibo <- txt[seq1]
+
+
+# 提取发表时间
+seq1 <- seq(2,length(txt),by=3)
+weibodate <- txt[seq1]
+
+# 提取赞转评
+seq1 <- seq(3,length(txt),by=3)
+weibozzp <- txt[seq1]
+
+zzp <- weibozzp %>% 
+  str_replace (.,'点赞数：','') %>%  
+  str_replace (.,'转发数：','') %>% 
+  str_replace (.,'评论数：','') %>% 
+  str_split(.,'\t ',3) 
+
+
+names(zzp) <- paste0('x',1:ncol(zzp))
+t(zzp) %>% as.numeric()
+ 
+```
+
+```{r 词云}
+
 
 # 新建分词器
 z <- worker()
-```
 
-```{r}
 # 新词
-new_user_word(分词器, "朱星杰", "n") 
+new_user_word(z, "朱星杰", "n") 
 ```
 
 ```{r}
@@ -36,7 +62,7 @@ segWords <- segment(txt,z)
 ```{r}
 # 停止词
 stopwords <- c("的", "了", "在", "是", "我", "有", "和", "就",  "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这",
-               "评论","转发","点赞","数","点赞数","发布","时间",'--')
+               "评论","转发","点赞","数","点赞数","发布","时间",'秒拍','流行之王','微博'，'骆明劼',)
 segWords <- filter_segment(segWords,stopwords)
 
 
