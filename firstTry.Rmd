@@ -3,13 +3,23 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+devtools::install_github('cttobin/ggthemr')
 ```{r}
 # 加载包
 library(tidyverse)
 library(jiebaR)
 library(wordcloud2)
 library(stringr)
+library(lubridate)
+library(ggplot2)
+library(plyr)
+library(ggthemes)
+library(ggthemr)
+library(plotly)
 
+```
+
+```{r}
 # 读入文件
 
 filePath <- 'weibo/2013783327.txt'
@@ -27,7 +37,13 @@ weibo <- txt[seq1]
 
 # 提取发表时间
 seq1 <- seq(2,length(txt),by=3)
-weibodate <- txt[seq1]
+weibodate <- txt[seq1] %>% str_replace(.,'发布时间：','')
+
+wd<- do.call(rbind,lapply(weibodate, data.frame))
+
+# factor转日期
+mydate <- as.Date(as.character.Date(weibodate)) %>% as.data.frame()
+
 
 # 提取赞转评
 seq1 <- seq(3,length(txt),by=3)
@@ -37,13 +53,36 @@ zzp <- weibozzp %>%
   str_replace (.,'点赞数：','') %>%  
   str_replace (.,'转发数：','') %>% 
   str_replace (.,'评论数：','') %>% 
-  str_split(.,'\t ',3) 
+  str_split(.,'\t ',3) %>% 
+  as.data.frame() 
 
+zzpt <- t(zzp) 
+zzptt <-apply(zzpt,2,function(x)as.numeric(as.character(x))) %>% as.data.frame()
 
-names(zzp) <- paste0('x',1:ncol(zzp))
-t(zzp) %>% as.numeric()
- 
+# 合并日期与转赞评
+db <- cbind(zzptt,mydate)
+names(db) <- c('dz','zf','pl','date')
 ```
+
+点转赞的折线图
+```{r}
+
+# change to long format
+
+db.recent <- db %>% filter(date>'2017-10-1')
+ldb <- db.recent %>% gather(key = variable, value = value, -date)
+
+# 绘图
+ggthemr('fresh')
+ggplot(ldb,aes(x=date,y=value,color=variable))+
+  geom_line(size=1)+
+  geom_point(size=1)
+
+# 动态
+ggplotly()
+  
+```
+
 
 ```{r 词云}
 
