@@ -3,9 +3,10 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-devtools::install_github('cttobin/ggthemr')
+
 ```{r}
 # 加载包
+
 library(tidyverse)
 library(jiebaR)
 library(wordcloud2)
@@ -102,17 +103,19 @@ htmlwidgets::saveWidget(as_widget(a),'index.html')
 z <- worker()
 
 # 新词
-new_user_word(z, "朱星杰", "n") 
+new_user_word(z, "朱星杰") 
+new_user_word(z, "流行之王") 
+new_user_word(z, "秒拍") 
+
 ```
 
 ```{r}
-segWords <- segment(txt,z)
+segWords <- segment(weibo,z)
 ```
 
 ```{r}
 # 停止词
-stopwords <- c("的", "了", "在", "是", "我", "有", "和", "就",  "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这",
-               "评论","转发","点赞","数","点赞数","发布","时间",'秒拍','流行之王','微博'，'骆明劼',)
+stopwords <- c("的", "了", "在", "是", "我", "有", "和", "就",  "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这")
 segWords <- filter_segment(segWords,stopwords)
 
 
@@ -129,9 +132,14 @@ tableWord <- plyr::count(segWords)
 write.csv(tableWord,'nid.csv')
 
 # 词云
-wordcloud2(tableWord, size = 2, fontFamily = "微软雅黑",  
 
-color = "random-light", backgroundColor = "grey")  
+tw <-  tableWord %>% filter(freq>1)
 
+figPath = system.file("examples/t.png",package = "wordcloud2")
+#figPath = figPath,
+wordcloud2(tw, size = 2,fontFamily = "微软雅黑",  
+color = "random-light", backgroundColor = "white")  
+# 导出为网页
+htmlwidgets::saveWidget(wc,'index2.html')
 ```
 
