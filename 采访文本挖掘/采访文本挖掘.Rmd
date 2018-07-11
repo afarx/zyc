@@ -1,0 +1,73 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+# 加载包
+
+library(tidyverse)
+library(jiebaR)
+library(wordcloud2)
+library(stringr)
+
+```
+
+```{r}
+# 读入文件
+filePath <- '回答.txt'
+text <- read_lines(filePath,skip=8)
+
+# 预处理
+txt <-  text[text!=""]
+
+```
+
+
+```{r 词云}
+
+# 新建分词器
+z <- worker()
+
+segWords <- segment(txt,z)
+
+# 停止词
+
+z=worker(stop_word = stopwords)
+
+
+# 新词
+engine_user <- worker(user='dictionary.txt')
+segment(words,engine_user)
+
+
+
+
+# 去除数字、英文、空格
+###去除数字和英文
+segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
+
+
+segWords<-str_trim(segWords)#去除空格
+
+
+```
+
+
+# 词频统计
+tableWord <- freq(segWords)
+write.csv(tableWord,'nid2.csv')
+
+# 词云
+
+tw <-  tableWord %>% filter(freq>1)
+
+figPath = system.file("examples/t.png",package = "wordcloud2")
+#figPath = figPath,
+wordcloud2(tw, size = 2,fontFamily = "微软雅黑",  
+color = "random-light", backgroundColor = "white")  
+
+
+```
+
